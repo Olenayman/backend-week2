@@ -1,0 +1,66 @@
+### Get all movies
+GET http://localhost:3000/movies
+
+### Get movie by ID (existing)
+GET http://localhost:3000/movies/1
+
+### Get movie by ID (non-existing)
+GET http://localhost:3000/movies/999
+
+### Create a new movie (valid)
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "The Dark Knight",
+  "director": "Christopher Nolan",
+  "year": 2008
+}
+
+### Create a new movie (invalid - missing title)
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "director": "Steven Spielberg",
+  "year": 1993
+}
+
+### Create a new movie (invalid - year too old)
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "Ancient Movie",
+  "director": "Unknown",
+  "year": 1800
+}
+
+### Update an existing movie
+PUT http://localhost:3000/movies/1
+Content-Type: application/json
+
+{
+  "title": "The Shawshank Redemption (Updated)",
+  "director": "Frank Darabont",
+  "year": 1994
+}
+
+### Update a non-existing movie
+PUT http://localhost:3000/movies/999
+Content-Type: application/json
+
+{
+  "title": "Non-existent",
+  "director": "Nobody",
+  "year": 2000
+}
+
+### Delete an existing movie
+DELETE http://localhost:3000/movies/3
+
+### Delete a non-existing movie
+DELETE http://localhost:3000/movies/999
+
+### Test undefined route
+GET http://localhost:3000/undefined-route
