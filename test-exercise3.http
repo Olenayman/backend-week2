@@ -1,0 +1,121 @@
+### Add movie 1
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "Inception",
+  "director": "Christopher Nolan",
+  "year": 2010
+}
+
+### Add movie 2
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "The Dark Knight",
+  "director": "Christopher Nolan",
+  "year": 2008
+}
+
+### Add movie 3
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "Interstellar",
+  "director": "Christopher Nolan",
+  "year": 2014
+}
+
+### Add movie 4
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "The Prestige",
+  "director": "Christopher Nolan",
+  "year": 2006
+}
+
+### Add movie 5
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "Jurassic Park",
+  "director": "Steven Spielberg",
+  "year": 1993
+}
+
+### Add movie 6
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "Schindler's List",
+  "director": "Steven Spielberg",
+  "year": 1993
+}
+
+### ========== QUERY PARAMETER TESTS ==========
+
+### Test 1: Get all movies (no filters)
+GET http://localhost:3000/movies
+
+### Test 2: Filter by year only
+GET http://localhost:3000/movies?year=2010
+
+### Test 3: Filter by director only
+GET http://localhost:3000/movies?director=Christopher Nolan
+
+### Test 4: Filter by title only (partial match)
+GET http://localhost:3000/movies?title=Dark
+
+### Test 5: Combine year and director
+GET http://localhost:3000/movies?year=2010&director=Christopher Nolan
+
+### Test 6: Combine year and director (no results)
+GET http://localhost:3000/movies?year=1993&director=Christopher Nolan
+
+### Test 7: Filter by director (different director)
+GET http://localhost:3000/movies?director=Steven Spielberg
+
+### Test 8: Filter by year (multiple results)
+GET http://localhost:3000/movies?year=1993
+
+### Test 9: Combine title and director
+GET http://localhost:3000/movies?title=The&director=Christopher Nolan
+
+### Test 10: Filter by minimum year
+GET http://localhost:3000/movies?minYear=2010
+
+### Test 11: Filter by maximum year
+GET http://localhost:3000/movies?maxYear=2000
+
+### Test 12: Filter by year range (minYear and maxYear)
+GET http://localhost:3000/movies?minYear=2006&maxYear=2010
+
+### Test 13: Combine all filters
+GET http://localhost:3000/movies?director=Christopher Nolan&minYear=2008&maxYear=2014
+
+### Test 14: Case insensitive search (lowercase)
+GET http://localhost:3000/movies?director=christopher nolan
+
+### Test 15: Partial title match
+GET http://localhost:3000/movies?title=inter
+
+### Test 16: No results (non-existent filter)
+GET http://localhost:3000/movies?director=Quentin Tarantino
+
+### Test 17: Invalid year parameter (should return all movies)
+GET http://localhost:3000/movies?year=invalid
+
+### Test 18: Empty query parameter
+GET http://localhost:3000/movies?title=
+
+### Test 19: Multiple filters with partial matches
+GET http://localhost:3000/movies?title=the&minYear=2005
+
+### Test 20: Director with year range
+GET http://localhost:3000/movies?director=Spielberg&year=1993

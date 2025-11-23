@@ -5,10 +5,7 @@ const app = express();
 const PORT = 3000;
 
 // ===== MIDDLEWARE =====
-// Parse JSON bodies
 app.use(express.json());
-
-// Log HTTP requests
 app.use(morgan('dev'));
 
 // ===== IN-MEMORY DATA STORE =====
@@ -21,7 +18,6 @@ let movies = [
 let nextId = 4;
 
 // ===== HELPER FUNCTIONS =====
-// Validate movie data
 function validateMovie(movie) {
   const errors = [];
   
@@ -42,16 +38,57 @@ function validateMovie(movie) {
   return errors;
 }
 
-// Find movie by ID
 function findMovieById(id) {
   return movies.find(m => m.id === parseInt(id));
 }
 
 // ===== ROUTES =====
 
-// GET /movies - Get all movies
+// GET /movies - Get all movies with optional filtering
 app.get('/movies', (req, res) => {
-  res.status(200).json(movies);
+  const { title, year, director, minYear, maxYear } = req.query;
+  
+  let filteredMovies = movies;
+  
+  // Filter by title (case-insensitive, partial match)
+  if (title) {
+    filteredMovies = filteredMovies.filter(movie => 
+      movie.title.toLowerCase().includes(title.toLowerCase())
+    );
+  }
+  
+  // Filter by exact year
+  if (year) {
+    const yearNum = parseInt(year);
+    if (!isNaN(yearNum)) {
+      filteredMovies = filteredMovies.filter(movie => movie.year === yearNum);
+    }
+  }
+  
+  // Filter by director (case-insensitive, partial match)
+  if (director) {
+    filteredMovies = filteredMovies.filter(movie => 
+      movie.director.toLowerCase().includes(director.toLowerCase())
+    );
+  }
+  
+  // Filter by minimum year
+  if (minYear) {
+    const minYearNum = parseInt(minYear);
+    if (!isNaN(minYearNum)) {
+      filteredMovies = filteredMovies.filter(movie => movie.year >= minYearNum);
+    }
+  }
+  
+  // Filter by maximum year
+  if (maxYear) {
+    const maxYearNum = parseInt(maxYear);
+    if (!isNaN(maxYearNum)) {
+      filteredMovies = filteredMovies.filter(movie => movie.year <= maxYearNum);
+    }
+  }
+  
+  res.status(200).json(filteredMovies);
 });
 
 // GET /movies/:id - Get a specific movie by ID
@@ -69,13 +106,11 @@ app.get('/movies/:id', (req, res) => {
 app.post('/movies', (req, res) => {
   const { title, director, year } = req.body;
   
-  // Validate input
   const errors = validateMovie(req.body);
   if (errors.length > 0) {
     return res.status(400).json({ errors });
   }
   
-  // Create new movie
   const newMovie = {
     id: nextId++,
     title: title.trim(),
@@ -95,13 +130,11 @@ app.put('/movies/:id', (req, res) => {
     return res.status(404).json({ error: 'Movie not found' });
   }
   
-  // Validate input
   const errors = validateMovie(req.body);
   if (errors.length > 0) {
     return res.status(400).json({ errors });
   }
   
-  // Update movie
   movie.title = req.body.title.trim();
   movie.director = req.body.director.trim();
   movie.year = req.body.year;
@@ -118,15 +151,15 @@ app.delete('/movies/:id', (req, res) => {
   }
   
   movies.splice(movieIndex, 1);
-  res.status(204).send(); // No content
+  res.status(204).send();
 });
 
-// ===== CATCH-ALL ROUTE FOR UNDEFINED ENDPOINTS =====
+// ===== CATCH-ALL ROUTE =====
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
 // ===== START SERVER =====
 app.listen(PORT, () => {
-  console.log(`🎬 Movie API server running on http://localhost:${PORT}`);
+  console.log(`🎬 Movie API server running on http://localhost:3000`);
 });
