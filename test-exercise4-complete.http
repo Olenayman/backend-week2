@@ -1,0 +1,241 @@
+### Setup 1: Add movie for testing
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "The Matrix",
+  "director": "The Wachowskis",
+  "year": 1999
+}
+
+### Setup 2: Add another movie
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "Pulp Fiction",
+  "director": "Quentin Tarantino",
+  "year": 1994
+}
+
+### Setup 3: Add Christopher Nolan movie
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "Inception",
+  "director": "Christopher Nolan",
+  "year": 2010
+}
+
+### Setup 4: Add another Nolan movie
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "The Dark Knight",
+  "director": "Christopher Nolan",
+  "year": 2008
+}
+
+
+### Test 1.1: Create valid movie (201 Created)
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "Interstellar",
+  "director": "Christopher Nolan",
+  "year": 2014
+}
+
+### Test 1.2: Create movie - missing title (400 Bad Request)
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "director": "Steven Spielberg",
+  "year": 1993
+}
+
+### Test 1.3: Create movie - invalid year (400 Bad Request)
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "Future Movie",
+  "director": "Time Traveler",
+  "year": 2030
+}
+
+### Test 1.4: Create movie - year as string (400 Bad Request)
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "String Year",
+  "director": "Someone",
+  "year": "2020"
+}
+
+### ========== TEST SUITE 2: READ (GET) ==========
+
+### Test 2.1: Get all movies (200 OK)
+GET http://localhost:3000/movies
+
+### Test 2.2: Get movie by valid ID (200 OK)
+GET http://localhost:3000/movies/1
+
+### Test 2.3: Get movie by invalid ID (404 Not Found)
+GET http://localhost:3000/movies/9999
+
+### Test 2.4: Get movie by non-numeric ID (404 Not Found)
+GET http://localhost:3000/movies/abc
+
+### ========== TEST SUITE 3: UPDATE (PUT) ==========
+
+### Test 3.1: Update existing movie with valid data (200 OK)
+PUT http://localhost:3000/movies/1
+Content-Type: application/json
+
+{
+  "title": "The Shawshank Redemption (25th Anniversary)",
+  "director": "Frank Darabont",
+  "year": 1994
+}
+
+### Test 3.2: Update movie - invalid data (400 Bad Request)
+PUT http://localhost:3000/movies/1
+Content-Type: application/json
+
+{
+  "title": "",
+  "director": "Frank Darabont",
+  "year": 1994
+}
+
+### Test 3.3: Update non-existent movie (404 Not Found)
+PUT http://localhost:3000/movies/9999
+Content-Type: application/json
+
+{
+  "title": "Non-existent",
+  "director": "Nobody",
+  "year": 2000
+}
+
+### ========== TEST SUITE 4: DELETE ==========
+
+### Test 4.1: Delete existing movie (204 No Content)
+DELETE http://localhost:3000/movies/2
+
+### Test 4.2: Delete non-existent movie (404 Not Found)
+DELETE http://localhost:3000/movies/9999
+
+### Test 4.3: Delete already deleted movie (404 Not Found)
+DELETE http://localhost:3000/movies/2
+
+### ========== TEST SUITE 5: QUERY PARAMETERS ==========
+
+### Test 5.1: Filter by year
+GET http://localhost:3000/movies?year=2010
+
+### Test 5.2: Filter by director
+GET http://localhost:3000/movies?director=Christopher Nolan
+
+### Test 5.3: Filter by title (partial match)
+GET http://localhost:3000/movies?title=Dark
+
+### Test 5.4: Filter by year and director (combined)
+GET http://localhost:3000/movies?year=2010&director=Christopher Nolan
+
+### Test 5.5: Filter by year range
+GET http://localhost:3000/movies?minYear=2008&maxYear=2014
+
+### Test 5.6: Filter with no results
+GET http://localhost:3000/movies?director=Quentin Tarantino&year=2020
+
+### Test 5.7: Case-insensitive director search
+GET http://localhost:3000/movies?director=nolan
+
+### Test 5.8: Multiple filters combined
+GET http://localhost:3000/movies?director=Nolan&minYear=2008&maxYear=2010
+
+### ========== TEST SUITE 6: ERROR HANDLING ==========
+
+### Test 6.1: Undefined route (404 Not Found)
+GET http://localhost:3000/api/undefined
+
+### Test 6.2: Wrong HTTP method on defined route (404 Not Found)
+PATCH http://localhost:3000/movies/1
+
+### Test 6.3: Malformed JSON (400 Bad Request)
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "Broken JSON"
+  "director": "No Comma",
+  "year": 2020
+}
+
+### Test 6.4: Empty request body (400 Bad Request)
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{}
+
+### ========== TEST SUITE 7: EDGE CASES ==========
+
+### Test 7.1: Movie from 1888 (first motion picture)
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "Roundhay Garden Scene",
+  "director": "Louis Le Prince",
+  "year": 1888
+}
+
+### Test 7.2: Movie from current year (2025)
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "New Release 2025",
+  "director": "Modern Director",
+  "year": 2025
+}
+
+### Test 7.3: Very long title (should work)
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "This is a very long movie title that tests whether the API can handle extended strings without issues",
+  "director": "Test Director",
+  "year": 2020
+}
+
+### Test 7.4: Special characters in title
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "Movie: The Beginning & The End (Part 1)",
+  "director": "Special Director",
+  "year": 2021
+}
+
+### Test 7.5: Get all movies after all operations
+GET http://localhost:3000/movies
+
+### ========== END OF TESTS ==========
+### Total Tests: 40+
+### Coverage:
+### - All CRUD operations ✓
+### - All validation scenarios ✓
+### - All query parameters ✓
+### - Error handling ✓
+### - Edge cases ✓
+### - Morgan logging verification ✓

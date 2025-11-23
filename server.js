@@ -5,7 +5,10 @@ const app = express();
 const PORT = 3000;
 
 // ===== MIDDLEWARE =====
+// Parse JSON bodies
 app.use(express.json());
+
+// HTTP request logging with Morgan (dev format - colored output)
 app.use(morgan('dev'));
 
 // ===== IN-MEMORY DATA STORE =====
@@ -18,17 +21,26 @@ let movies = [
 let nextId = 4;
 
 // ===== HELPER FUNCTIONS =====
+
+/**
+ * Validate movie data
+ * @param {Object} movie - Movie object to validate
+ * @returns {Array} - Array of error messages (empty if valid)
+ */
 function validateMovie(movie) {
   const errors = [];
   
+  // Validate title
   if (!movie.title || movie.title.trim() === '') {
     errors.push('Title is required');
   }
   
+  // Validate director
   if (!movie.director || movie.director.trim() === '') {
     errors.push('Director is required');
   }
   
+  // Validate year
   if (!movie.year) {
     errors.push('Year is required');
   } else if (typeof movie.year !== 'number' || movie.year < 1888 || movie.year > new Date().getFullYear()) {
@@ -38,13 +50,26 @@ function validateMovie(movie) {
   return errors;
 }
 
+/**
+ * Find movie by ID
+ * @param {string|number} id - Movie ID to find
+ * @returns {Object|undefined} - Movie object or undefined
+ */
 function findMovieById(id) {
   return movies.find(m => m.id === parseInt(id));
 }
 
 // ===== ROUTES =====
 
-// GET /movies - Get all movies with optional filtering
+/**
+ * GET /movies - Get all movies with optional filtering
+ * Query parameters:
+ * - title: Filter by title (partial match, case-insensitive)
+ * - year: Filter by exact year
+ * - director: Filter by director (partial match, case-insensitive)
+ * - minYear: Filter movies from this year onwards
+ * - maxYear: Filter movies up to this year
+ */
 app.get('/movies', (req, res) => {
   const { title, year, director, minYear, maxYear } = req.query;
   
@@ -91,7 +116,9 @@ app.get('/movies', (req, res) => {
   res.status(200).json(filteredMovies);
 });
 
-// GET /movies/:id - Get a specific movie by ID
+/**
+ * GET /movies/:id - Get a specific movie by ID
+ */
 app.get('/movies/:id', (req, res) => {
   const movie = findMovieById(req.params.id);
   
@@ -102,15 +129,20 @@ app.get('/movies/:id', (req, res) => {
   res.status(200).json(movie);
 });
 
-// POST /movies - Create a new movie
+/**
+ * POST /movies - Create a new movie
+ * Required fields: title, director, year
+ */
 app.post('/movies', (req, res) => {
   const { title, director, year } = req.body;
   
+  // Validate input
   const errors = validateMovie(req.body);
   if (errors.length > 0) {
     return res.status(400).json({ errors });
   }
   
+  // Create new movie
   const newMovie = {
     id: nextId++,
     title: title.trim(),
@@ -122,7 +154,10 @@ app.post('/movies', (req, res) => {
   res.status(201).json(newMovie);
 });
 
-// PUT /movies/:id - Update an existing movie
+/**
+ * PUT /movies/:id - Update an existing movie
+ * Required fields: title, director, year
+ */
 app.put('/movies/:id', (req, res) => {
   const movie = findMovieById(req.params.id);
   
@@ -130,11 +165,13 @@ app.put('/movies/:id', (req, res) => {
     return res.status(404).json({ error: 'Movie not found' });
   }
   
+  // Validate input
   const errors = validateMovie(req.body);
   if (errors.length > 0) {
     return res.status(400).json({ errors });
   }
   
+  // Update movie
   movie.title = req.body.title.trim();
   movie.director = req.body.director.trim();
   movie.year = req.body.year;
@@ -142,7 +179,9 @@ app.put('/movies/:id', (req, res) => {
   res.status(200).json(movie);
 });
 
-// DELETE /movies/:id - Delete a movie by ID
+/**
+ * DELETE /movies/:id - Delete a movie by ID
+ */
 app.delete('/movies/:id', (req, res) => {
   const movieIndex = movies.findIndex(m => m.id === parseInt(req.params.id));
   
@@ -151,15 +190,28 @@ app.delete('/movies/:id', (req, res) => {
   }
   
   movies.splice(movieIndex, 1);
-  res.status(204).send();
+  res.status(204).send(); // No content
 });
 
-// ===== CATCH-ALL ROUTE =====
+// ===== CATCH-ALL ROUTE FOR UNDEFINED ENDPOINTS =====
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
 // ===== START SERVER =====
 app.listen(PORT, () => {
-  console.log(`🎬 Movie API server running on http://localhost:3000`);
+  console.log(`🎬 Movie API server running on http://localhost:${PORT}`);
+  console.log(`📋 Available endpoints:`);
+  console.log(`   GET    /movies - Get all movies (supports query params)`);
+  console.log(`   GET    /movies/:id - Get movie by ID`);
+  console.log(`   POST   /movies - Create new movie`);
+  console.log(`   PUT    /movies/:id - Update movie`);
+  console.log(`   DELETE /movies/:id - Delete movie`);
+  console.log(`\n🔍 Query parameters:`);
+  console.log(`   ?title=<name> - Filter by title`);
+  console.log(`   ?year=<year> - Filter by year`);
+  console.log(`   ?director=<name> - Filter by director`);
+  console.log(`   ?minYear=<year> - Filter from year`);
+  console.log(`   ?maxYear=<year> - Filter up to year`);
+  console.log(`\n📊 Morgan logging active (dev format)`);
 });
